@@ -11,7 +11,7 @@ var redis = require('redis');
 
 var client = redis.createClient(6379, '127.0.0.1', {})
 var app = express();
-var flag = false;
+var flag = "False";
 app.configure(function () {
     app.use(express.logger('dev'));     /* 'default', 'short', 'tiny', 'dev' */
     app.use(express.bodyParser());
