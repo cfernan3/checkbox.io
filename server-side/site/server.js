@@ -7,9 +7,11 @@ var express = require('express'),
 	create = require('./routes/create.js'),
 	study = require('./routes/study.js'),
 	admin = require('./routes/admin.js');
+var redis = require('redis');
 
+var client = redis.createClient(6379, '127.0.0.1', {})
 var app = express();
-
+var flag = false;
 app.configure(function () {
     app.use(express.logger('dev'));     /* 'default', 'short', 'tiny', 'dev' */
     app.use(express.bodyParser());
@@ -25,15 +27,36 @@ var corsOptions = {
 
 app.options('/api/study/vote/submit/', cors(corsOptions));
 
-app.post('/api/design/survey', 
-	function(req,res)
-	{
-		console.log(req.body.markdown);
-		//var text = marqdown.render( req.query.markdown );
-		var text = marqdown.render( req.body.markdown );
-		res.send( {preview: text} );
-	}
+client.get('previewFlag', function(err,reply){
+
+var flag = reply;
+
+if (flag == "True"){
+app.post('/api/design/survey',
+        function(req,res)
+        {
+                console.log(req.body.markdown);
+                //var text = marqdown.render( req.query.markdown );
+                var text = marqdown.render( req.body.markdown );
+                //var text = "Feature!!!"
+                res.send( {preview: text} );
+                res.end();
+        }
 );
+}
+else{
+app.post('/api/design/survey',
+        function(req,res)
+        {
+                console.log(req.body.markdown);
+                //var text = marqdown.render( req.query.markdown );
+                var text = "Feature Coming Soon!!!"
+                res.send( {preview: text} );
+                res.end();
+        }
+);
+}
+});
 
 //app.get('/api/design/survey/all', routes.findAll );
 //app.get('/api/design/survey/:id', routes.findById );
